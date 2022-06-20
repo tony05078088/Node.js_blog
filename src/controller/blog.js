@@ -28,7 +28,22 @@ const getDetail = (id) => {
   };
 };
 
+const newBlog = (blogData = {}) => {
+  // blogData 是一個blog Object,包含 title, content 屬性
+  return {
+    id: 3, // 表示新建blog,插入到數據表裡的id
+  };
+};
+const updateBlog = (id, blogData = {}) => {
+  // id即為要更新blog的id
+  // blogData 是一個blog Object,包含 title, content 屬性
+  console.log("update blog: ", id, blogData);
+  return true;
+};
+
 module.exports = {
   getList,
   getDetail,
+  newBlog,
+  updateBlog,
 };
