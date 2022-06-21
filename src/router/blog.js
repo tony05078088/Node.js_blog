@@ -3,6 +3,7 @@ const {
   getDetail,
   newBlog,
   updateBlog,
+  deleteBlog,
 } = require("../controller/blog");
 const { SuccessModel, ErrorModal } = require("../model/resModel");
 
@@ -41,9 +42,11 @@ const handleBlogRouter = (req, res) => {
 
   //   刪除一篇blog
   if (method === "POST" && req.path === "/api/blog/del") {
-    return {
-      msg: "這是更新blog的接口",
-    };
+    const result = deleteBlog(id);
+    if (result) return new SuccessModel();
+    else {
+      return new ErrorModal("刪除blog失敗");
+    }
   }
 };
 
