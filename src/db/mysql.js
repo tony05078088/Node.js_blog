@@ -19,6 +19,7 @@ function exec(sql) {
       resolve(result);
     });
   });
+  return promise;
 }
 
 module.exports = {
