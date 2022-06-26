@@ -13,20 +13,26 @@ const getList = (author, keyword) => {
 };
 
 const getDetail = (id) => {
-  return {
-    id: 1,
-    title: "標題A",
-    content: "內容",
-    createTime: 1655520547848,
-    author: "林威廉",
-  };
+  const sql = `select * from blog where id='${id}'`;
+  return exec(sql).then((rows) => {
+    return rows[0];
+  });
 };
 
 const newBlog = (blogData = {}) => {
-  // blogData 是一個blog Object,包含 title, content 屬性
-  return {
-    id: 3, // 表示新建blog,插入到數據表裡的id
-  };
+  // blogData 是一個blog Object,包含 title, content, author 屬性
+  const title = blogData.title;
+  const content = blogData.content;
+  const author = blogData.author;
+  const createTime = Date.now();
+  const sql = `insert into blog (title,content,createtime,author) values('${title}', '${content}', '${createTime}', '${author}') `;
+
+  return exec(sql).then((insertData) => {
+    console.log(insertData);
+    return {
+      id: insertData.insertId,
+    };
+  });
 };
 const updateBlog = (id, blogData = {}) => {
   // id即為要更新blog的id

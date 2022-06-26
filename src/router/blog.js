@@ -25,14 +25,23 @@ const handleBlogRouter = (req, res) => {
 
   //   獲取blog 細節
   if (method === "GET" && req.path === "/api/blog/detail") {
-    const data = getDetail(id);
-    return new SuccessModel(data);
+    // const data = getDetail(id);
+    // return new SuccessModel(data);
+    const result = getDetail(id);
+    return result.then((data) => {
+      return new SuccessModel(data);
+    });
   }
 
   //   新建一篇blog
   if (method === "POST" && req.path === "/api/blog/new") {
-    const data = newBlog(req.body);
-    return new SuccessModel(data);
+    // const data = newBlog(req.body);
+    // return new SuccessModel(data);
+    req.body.author = "林威廉測試";
+    const result = newBlog(req.body);
+    return result.then((data) => {
+      return new SuccessModel(data);
+    });
   }
 
   //   更新一篇blog
