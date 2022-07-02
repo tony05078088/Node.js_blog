@@ -28,7 +28,6 @@ const newBlog = (blogData = {}) => {
   const sql = `insert into blog (title,content,createtime,author) values('${title}', '${content}', '${createTime}', '${author}') `;
 
   return exec(sql).then((insertData) => {
-    console.log(insertData);
     return {
       id: insertData.insertId,
     };
@@ -37,13 +36,28 @@ const newBlog = (blogData = {}) => {
 const updateBlog = (id, blogData = {}) => {
   // id即為要更新blog的id
   // blogData 是一個blog Object,包含 title, content 屬性
-  console.log("update blog: ", id, blogData);
-  return true;
+
+  const title = blogData.title;
+  const content = blogData.content;
+  const sql = `update blog set title='${title}',content='${content}' where id=${id}`;
+  return exec(sql).then((updateData) => {
+    console.log(updateData);
+    if (updateData.affectedRows > 0) {
+      return true;
+    }
+    return false;
+  });
 };
 
-const deleteBlog = (id) => {
+const deleteBlog = (id, author) => {
   // id => 刪除blog的 id
-  return true;
+  const sql = `delete from blog where id='${id}' and author='${author}'`;
+  return exec(sql).then((deleteData) => {
+    if (deleteData.affectedRows > 0) {
+      return true;
+    }
+    return false;
+  });
 };
 
 module.exports = {

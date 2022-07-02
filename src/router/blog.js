@@ -47,19 +47,26 @@ const handleBlogRouter = (req, res) => {
   //   更新一篇blog
   if (method === "POST" && req.path === "/api/blog/update") {
     const result = updateBlog(id, req.body);
-    if (result) return new SuccessModel();
-    else {
-      return new ErrorModal("更新blog失敗");
-    }
+    return result.then((val) => {
+      if (val) {
+        return new SuccessModel();
+      } else {
+        return new ErrorModal("更新blog 失敗");
+      }
+    });
   }
 
   //   刪除一篇blog
   if (method === "POST" && req.path === "/api/blog/del") {
-    const result = deleteBlog(id);
-    if (result) return new SuccessModel();
-    else {
-      return new ErrorModal("刪除blog失敗");
-    }
+    const author = "林威廉B"; //假數據
+    const result = deleteBlog(id, author);
+    return result.then((val) => {
+      if (val) {
+        return new SuccessModel();
+      } else {
+        return new ErrorModal("刪除blog失敗");
+      }
+    });
   }
 };
 
