@@ -1,6 +1,6 @@
 const { login } = require("../controller/user");
 const { SuccessModel, ErrorModal } = require("../model/resModel");
-
+const { set } = require("../db/redis");
 // 獲取cookie的過期時間
 const getCookieExpire = () => {
   const d = new Date();
@@ -19,13 +19,11 @@ const handleUserRouter = (req, res) => {
     const result = login(username, password);
     return result.then((data) => {
       if (data.username) {
-        // 操作cookie
-        res.setHeader(
-          "Set-Cookie",
-          `username=${
-            data.username
-          };path=/; httpOnly; expires=${getCookieExpire()}`
-        );
+        // 設置session
+        req.session.username = data.username;
+        req.session.realname = data.realname;
+        // 同步到redis
+        set(req.sessionId, req.session);
 
         return new SuccessModel();
       } else {
@@ -36,8 +34,12 @@ const handleUserRouter = (req, res) => {
 
   // 登入驗證測試
   if (method === "GET" && req.path === "/api/user/login-test") {
-    if (req.cookie.username) {
-      return Promise.resolve(new SuccessModel());
+    if (req.session.username) {
+      return Promise.resolve(
+        new SuccessModel({
+          username: req.session,
+        })
+      );
     }
     return Promise.resolve(new ErrorModal("尚未登入"));
   }
