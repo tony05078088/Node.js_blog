@@ -7,16 +7,35 @@ const {
 } = require("../controller/blog");
 const { SuccessModel, ErrorModal } = require("../model/resModel");
 
+// 統一的登錄驗證函數
+const loginCheck = (req) => {
+  if (!req.session.username) {
+    return Promise.resolve(new ErrorModal("尚未登入"));
+  }
+};
+
 const handleBlogRouter = (req, res) => {
   const method = req.method;
   const id = req.query.id;
 
   //   獲取blog列表
   if (method === "GET" && req.path === "/api/blog/list") {
-    const author = req.query.author || "";
+    let author = req.query.author || "";
     const keyword = req.query.keyword || "";
     // const listData = getList(author, keyword);
     // return new SuccessModel(listData);
+
+    if (req.query.isadmin) {
+      // 管理員介面
+      const loginCheckResult = loginCheck(req);
+      if (loginCheckResult) {
+        // 未登錄
+        return loginCheckResult;
+      }
+      // 強制只能查詢自己的blog
+      author = req.session.username;
+    }
+
     const result = getList(author, keyword);
     return result.then((listData) => {
       return new SuccessModel(listData);
@@ -37,7 +56,14 @@ const handleBlogRouter = (req, res) => {
   if (method === "POST" && req.path === "/api/blog/new") {
     // const data = newBlog(req.body);
     // return new SuccessModel(data);
-    req.body.author = "林威廉測試";
+
+    const loginCheckResult = loginCheck(req);
+    if (loginCheckResult) {
+      //  未登錄
+      return loginCheckResult;
+    }
+
+    req.body.author = req.session.username;
     const result = newBlog(req.body);
     return result.then((data) => {
       return new SuccessModel(data);
@@ -46,6 +72,12 @@ const handleBlogRouter = (req, res) => {
 
   //   更新一篇blog
   if (method === "POST" && req.path === "/api/blog/update") {
+    const loginCheckResult = loginCheck(req);
+    if (loginCheckResult) {
+      //  未登錄
+      return loginCheckResult;
+    }
+
     const result = updateBlog(id, req.body);
     return result.then((val) => {
       if (val) {
@@ -58,7 +90,13 @@ const handleBlogRouter = (req, res) => {
 
   //   刪除一篇blog
   if (method === "POST" && req.path === "/api/blog/del") {
-    const author = "林威廉B"; //假數據
+    const loginCheckResult = loginCheck(req);
+    if (loginCheckResult) {
+      //  未登錄
+      return loginCheckResult;
+    }
+
+    const author = req.session.username;
     const result = deleteBlog(id, author);
     return result.then((val) => {
       if (val) {
